@@ -1,47 +1,155 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>かんたんカウンター</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    button {
-      font-size: 20px;
-      margin: 10px;
-      padding: 10px 20px;
-    }
-    #count {
-      font-size: 40px;
-      margin: 20px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>大学・バイト カレンダー</title>
+
+<style>
+  body {
+    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    background: linear-gradient(270deg, #89f7fe, #66a6ff, #fbc2eb);
+    background-size: 600% 600%;
+    animation: bgMove 15s ease infinite;
+  }
+
+  @keyframes bgMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  h1 {
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  .calendar {
+    max-width: 900px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+  }
+
+  .day-name {
+    text-align: center;
+    font-weight: bold;
+    color: white;
+  }
+
+  .day {
+    background: rgba(255,255,255,0.85);
+    border-radius: 12px;
+    min-height: 120px;
+    padding: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: fadeIn 0.6s ease;
+  }
+
+  .day:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .date {
+    font-size: 0.8em;
+    color: #555;
+  }
+
+  .event {
+    margin-top: 4px;
+    padding: 4px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    animation: pop 0.3s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .class {
+    background: #c8e6c9;
+  }
+
+  .job {
+    background: #bbdefb;
+  }
+</style>
 </head>
+
 <body>
 
-  <h1>カウンターアプリ</h1>
-  <div id="count">0</div>
+<h1>📅 大学・バイト カレンダー</h1>
 
-  <button onclick="increment()">＋</button>
-  <button onclick="decrement()">－</button>
+<div class="calendar" id="calendar"></div>
 
-  <script>
-    let count = 0;
+<script>
+const calendar = document.getElementById("calendar");
+const today = new Date();
+const year = today.getFullYear();
+const month = today.getMonth();
 
-    function increment() {
-      count++;
-      document.getElementById("count").textContent = count;
-    }
+const schedules = JSON.parse(localStorage.getItem("schedules") || "[]");
 
-    function decrement() {
-      count--;
-      document.getElementById("count").textContent = count;
-    }
-  </script>
+const days = ["日","月","火","水","木","金","土"];
+days.forEach(d => {
+  const div = document.createElement("div");
+  div.className = "day-name";
+  div.textContent = d;
+  calendar.appendChild(div);
+});
+
+const firstDay = new Date(year, month, 1).getDay();
+const lastDate = new Date(year, month + 1, 0).getDate();
+
+for (let i = 0; i < firstDay; i++) {
+  calendar.appendChild(document.createElement("div"));
+}
+
+for (let d = 1; d <= lastDate; d++) {
+  const dateStr = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  const div = document.createElement("div");
+  div.className = "day";
+  div.innerHTML = `<div class="date">${d}</div>`;
+
+  schedules
+    .filter(s => s.date === dateStr)
+    .forEach(s => {
+      const e = document.createElement("div");
+      e.className = `event ${s.type}`;
+      e.textContent = `${s.type === "class" ? "🎓" : "💼"} ${s.title}`;
+      div.appendChild(e);
+    });
+
+  div.onclick = () => addEvent(dateStr);
+  calendar.appendChild(div);
+}
+
+function addEvent(date) {
+  const title = prompt("授業名 or バイト先");
+  if (!title) return;
+
+  const type = confirm("OK = 大学 / キャンセル = バイト") ? "class" : "job";
+  schedules.push({ date, title, type });
+  localStorage.setItem("schedules", JSON.stringify(schedules));
+  location.reload();
+}
+</script>
 
 </body>
 </html>
 
+  
