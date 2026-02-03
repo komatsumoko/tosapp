@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>かんたんカウンター</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    button {
+      font-size: 20px;
+      margin: 10px;
+      padding: 10px 20px;
+    }
+    #count {
+      font-size: 40px;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>カウンターアプリ</h1>
+  <div id="count">0</div>
+
+  <button onclick="increment()">＋</button>
+  <button onclick="decrement()">－</button>
+
+  <script>
+    let count = 0;
+
+    function increment() {
+      count++;
+      document.getElementById("count").textContent = count;
+    }
+
+    function decrement() {
+      count--;
+      document.getElementById("count").textContent = count;
+    }
+  </script>
+
+</body>
+</html>
 
